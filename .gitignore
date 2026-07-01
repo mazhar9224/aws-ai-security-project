@@ -1,0 +1,35 @@
+# === Secrets & Credentials ===
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# === AWS ===
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+!*.tfvars.example
+.terraform/
+
+# === Python ===
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# === Node / React ===
+node_modules/
+build/
+dist/
+
+# === Docker ===
+*.tar
+
+# === IDE ===
+.idea/
+.vscode/
+*.swp
+.DS_Store
