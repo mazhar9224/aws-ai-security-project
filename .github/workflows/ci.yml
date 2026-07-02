@@ -2,48 +2,38 @@ name: AI Security CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies
         run: |
           cd backend
-          python -m pip install --upgrade pip
-          pip install fastapi uvicorn httpx pytest
-
+          pip install -r requirements.txt
       - name: Test backend health
         run: |
           cd backend
-          python -c "from app.main import app; print('Backend imports OK')"
+          python -c "import app.main; print('Backend imports OK')"
 
   test-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node.js
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install dependencies
+      - name: Install and build
         run: |
           cd frontend
           npm install
-
-      - name: Build frontend
-        run: |
-          cd frontend
           npm run build
