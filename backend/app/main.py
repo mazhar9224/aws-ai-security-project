@@ -141,6 +141,7 @@ async def analyze_threat(
         except Exception as claude_error:
             raise HTTPException(status_code=503, detail=f"AI models unavailable: {str(claude_error)}")
 
+    save_threat_to_db("anonymous", request.message, {"explanation": ai_response})
     return {
         "response": ai_response,
         "model_used": model_used,
