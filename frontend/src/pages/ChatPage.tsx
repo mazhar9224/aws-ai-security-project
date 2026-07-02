@@ -3,6 +3,7 @@ import { signOut } from '../services/auth';
 import { analyzeThreats } from '../services/api';
 import { Send, LogOut, Bot, User, Shield, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ThreatHistory from '../components/ThreatHistory';
 
 interface Message {
   id: string;
@@ -26,6 +27,7 @@ export default function ChatPage({ onLogout }: ChatPageProps) {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [historyRefresh, setHistoryRefresh] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -141,6 +143,8 @@ export default function ChatPage({ onLogout }: ChatPageProps) {
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      <ThreatHistory refreshTrigger={historyRefresh} />
 
       {/* Input */}
       <div className="bg-gray-800 border-t border-gray-700 px-4 py-4">
