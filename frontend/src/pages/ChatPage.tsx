@@ -61,7 +61,7 @@ export default function ChatPage({ onLogout }: ChatPageProps) {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: typeof response === 'string' ? response : JSON.stringify(response, null, 2),
+        content: typeof response === 'string' ? response : (response.response || JSON.stringify(response, null, 2)),
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, aiMessage]);
