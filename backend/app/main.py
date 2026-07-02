@@ -9,6 +9,28 @@ import boto3
 # Secrets Manager cache (loaded once per Lambda container)
 _secrets_cache = {}
 
+# DynamoDB setup
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+threat_table = dynamodb.Table('security-threats')
+
+def save_threat_to_db(user_id: str, input_text: str, result: dict):
+    """Save threat analysis result to DynamoDB"""
+    import datetime
+    try:
+        threat_table.put_item(Item={
+            'userId': user_id,
+            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'input': input_text,
+            'threatType': result.get('threat_type', 'UNKNOWN'),
+            'riskScore': str(result.get('risk_score', 0)),
+            'action': result.get('action', 'UNKNOWN'),
+            'explanation': result.get('explanation', ''),
+            'recommendation': result.get('recommendation', '')
+        })
+    except Exception as e:
+        print(f"DynamoDB save error: {e}")
+
+
 def get_secret(secret_name: str) -> str:
     if secret_name not in _secrets_cache:
         client = boto3.client("secretsmanager", region_name="us-east-1")
