@@ -4,6 +4,18 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from datetime import datetime
 import os
+import boto3
+
+# Secrets Manager cache (loaded once per Lambda container)
+_secrets_cache = {}
+
+def get_secret(secret_name: str) -> str:
+    if secret_name not in _secrets_cache:
+        client = boto3.client("secretsmanager", region_name="us-east-1")
+        response = client.get_secret_value(SecretId=secret_name)
+        _secrets_cache[secret_name] = response["SecretString"]
+    return _secrets_cache[secret_name]
+
 import httpx
 from dotenv import load_dotenv
 from mangum import Mangum
@@ -48,8 +60,8 @@ async def analyze_threat(
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
-    groq_api_key = os.getenv("GROQ_API_KEY")
-    anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+    groq_api_key = get_secret("ai-security/groq-api-key")
+    anthropic_api_key = get_secret("ai-security/anthropic-api-key")
 
     # Try Groq first (fast & free)
     try:
