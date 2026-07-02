@@ -147,4 +147,19 @@ async def analyze_threat(
         "timestamp": datetime.utcnow().isoformat()
     }
 
+
+@app.get("/history")
+async def get_threat_history(limit: int = 20, user_id: str = "anonymous"):
+    """Get threat analysis history from DynamoDB"""
+    try:
+        from boto3.dynamodb.conditions import Key
+        response = threat_table.query(
+            KeyConditionExpression=Key('userId').eq(user_id),
+            ScanIndexForward=False,
+            Limit=limit
+        )
+        return {"history": response.get('Items', []), "count": response.get('Count', 0)}
+    except Exception as e:
+        return {"history": [], "count": 0, "error": str(e)}
+
 handler = Mangum(app, lifespan="off")
